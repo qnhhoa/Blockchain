@@ -12,6 +12,7 @@ contract SupplyChain {
     struct Product{
         address creator;
         string productName;
+        string details;
         uint256 productId;
         string date;
         uint256 totalStates;
@@ -32,8 +33,8 @@ contract SupplyChain {
         return string(bytes_c);
     }
     
-    function newItem(string memory _text, string memory _date) public returns (bool) {
-        Product memory newItem = Product({creator: msg.sender, totalStates: 0,productName: _text, productId: items, date: _date});
+    function newItem(string memory _text, string memory _detail, string memory _date) public returns (bool) {
+        Product memory newItem = Product({creator: msg.sender, totalStates: 0,productName: _text, details: _detail, productId: items, date: _date});
         allProducts[items]=newItem;
         items = items+1;
         emit Added(items-1);
@@ -50,12 +51,24 @@ contract SupplyChain {
         allProducts[_productId].totalStates = allProducts[_productId].totalStates +1;
         return info;
     }
+        function update(uint _productId, string memory info) public returns (string memory) {
+        require(_productId<=items);
+        
+        State memory newState = State({person: msg.sender, description: info});
+        
+        allProducts[_productId].positions[ allProducts[_productId].totalStates ]=newState;
+        
+        allProducts[_productId].totalStates = allProducts[_productId].totalStates +1;
+        return info;
+    }
     
     function searchProduct(uint _productId) public returns (string memory) {
 
         require(_productId<=items);
         string memory output="Tên sản phẩm: ";
         output=concat(output, allProducts[_productId].productName);
+        output=concat(output, "<br>Mô tả: ");
+        output=concat(output, allProducts[_productId].details);
         output=concat(output, "<br>Ngày sản xuất: ");
         output=concat(output, allProducts[_productId].date);
         
